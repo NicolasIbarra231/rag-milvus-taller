@@ -1,0 +1,12 @@
+{
+  "modelo": "intfloat/multilingual-e5-small",
+  "revision": null,
+  "dimension": 384,
+  "max_tokens": 512,
+  "prefijo_query": "query: ",
+  "prefijo_passage": "passage: ",
+  "normalizado": true,
+  "metrica_milvus": "COSINE",
+  "estrategia_chunks": "struct256o32",
+  "sentence_transformers": "5.7.0"
+}

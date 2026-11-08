@@ -1,0 +1,7 @@
+# Configuración del etcd EMBEBIDO dentro del contenedor de Milvus
+# (equivalente al que genera el script oficial standalone_embed.sh de Milvus).
+listen-client-urls: http://0.0.0.0:2379
+advertise-client-urls: http://0.0.0.0:2379
+quota-backend-bytes: 4294967296
+auto-compaction-mode: revision
+auto-compaction-retention: '1000'

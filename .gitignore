@@ -1,0 +1,14 @@
+.env
+__pycache__/
+.pytest_cache/
+.venv/
+.idea/
+.vscode/
+*.db
+# Datos restringidos: el corpus y todo lo que contiene su texto NO se publica
+data/*.parquet
+data/muestras/
+# Resultados crudos y logs: se publican solo los anonimizados/curados en reports/
+reports/logs/
+reports/*.jsonl
+reports/*.csv

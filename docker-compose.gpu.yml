@@ -1,0 +1,18 @@
+# Override para PC con GPU NVIDIA: Ollama usa la GPU para los LLM.
+# Requisitos: driver NVIDIA + NVIDIA Container Toolkit (Linux) o Docker Desktop con WSL2 (Windows).
+# Prueba previa: docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+#
+# El encoder de la API sigue en CPU a propósito (solo codifica una pregunta por petición).
+services:
+  ollama:
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${OLLAMA_GPU_COUNT:-1}
+              capabilities: [gpu]

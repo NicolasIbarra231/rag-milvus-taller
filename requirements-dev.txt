@@ -1,0 +1,5 @@
+# Pruebas: Milvus Lite permite probar el esquema y la búsqueda sin levantar Docker.
+-r requirements.txt
+pytest>=8,<10
+httpx>=0.27,<1
+milvus-lite>=2.4.10

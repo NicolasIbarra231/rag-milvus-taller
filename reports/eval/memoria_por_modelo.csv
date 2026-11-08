@@ -1,0 +1,15 @@
+failed to get console mode for stdout: The handle is invalid.
+qwen2.5:1.5b,rag-frontend,0.00%,43.41MiB / 512MiB
+qwen2.5:1.5b,rag-api,0.30%,757.7MiB / 3GiB
+qwen2.5:1.5b,rag-ollama,0.00%,1.415GiB / 6GiB
+qwen2.5:1.5b,rag-milvus,5.91%,348.6MiB / 4GiB
+failed to get console mode for stdout: The handle is invalid.
+llama3.2:1b,rag-frontend,0.00%,43.41MiB / 512MiB
+llama3.2:1b,rag-api,0.40%,757.7MiB / 3GiB
+llama3.2:1b,rag-ollama,0.01%,1.75GiB / 6GiB
+llama3.2:1b,rag-milvus,8.95%,348.8MiB / 4GiB
+failed to get console mode for stdout: The handle is invalid.
+llama3.2:3b,rag-frontend,0.00%,43.41MiB / 512MiB
+llama3.2:3b,rag-api,0.45%,757.8MiB / 3GiB
+llama3.2:3b,rag-ollama,0.01%,2.79GiB / 6GiB
+llama3.2:3b,rag-milvus,12.02%,349.1MiB / 4GiB

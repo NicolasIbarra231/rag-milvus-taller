@@ -1,0 +1,15 @@
+# Dependencias de ejecución (API, interfaz e ingesta).
+# torch se instala aparte en el Dockerfile desde el índice CPU de PyTorch (imagen ~1,5 GB más liviana):
+# el encoder solo codifica preguntas en línea; la GPU queda para Ollama.
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+pymilvus==2.6.6
+sentence-transformers==3.4.1
+tokenizers>=0.20,<1
+pyarrow>=17,<22
+pandas>=2.2,<3
+numpy>=1.26,<3
+streamlit==1.45.1
+requests>=2.32,<3
+pydantic>=2.8,<3
+openpyxl==3.1.5          # planilla de evaluación humana (scripts/evaluar_gold.py)

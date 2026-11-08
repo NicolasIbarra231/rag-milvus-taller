@@ -1,0 +1,86 @@
+{
+  "fecha_utc": "2026-11-08T20:59:39.903703+00:00",
+  "gold": {
+    "archivo": "data/gold/gold_v1.jsonl",
+    "sha256": "d3270ff41b0e2ccf3de4029f59b1b7e0beca3cdc193a98aaf9ea8a63ffd780ba"
+  },
+  "parametros_rag": {
+    "model": "qwen2.5:1.5b",
+    "k": 5,
+    "estrategia": "diversificada",
+    "prompt_version": "rag_v5",
+    "candidatos": 30,
+    "max_contexto_chars": 6000,
+    "temperature": 0.0,
+    "seed": 42,
+    "num_ctx": 4096,
+    "num_predict": 250
+  },
+  "coleccion": "rag_struct256_e5",
+  "contrato_encoder": {
+    "modelo": "intfloat/multilingual-e5-small",
+    "revision": null,
+    "dimension": 384,
+    "max_tokens": 512,
+    "prefijo_query": "query: ",
+    "prefijo_passage": "passage: ",
+    "normalizado": true,
+    "metrica_milvus": "COSINE",
+    "estrategia_chunks": "struct256o32",
+    "sentence_transformers": "5.7.0",
+    "_origen": "data/encoder_config.json"
+  },
+  "salud": {
+    "milvus": {
+      "ok": true,
+      "coleccion": "rag_struct256_e5",
+      "existe": true,
+      "registros": 2248,
+      "dimension": 384
+    },
+    "ollama": {
+      "ok": true,
+      "version": "0.40.15",
+      "modelos": 3
+    },
+    "encoder": {
+      "ok": true,
+      "modelo": "intfloat/multilingual-e5-small",
+      "dimension": 384
+    }
+  },
+  "modelos_instalados": [
+    {
+      "nombre": "llama3.2:1b",
+      "tamano_gb": 1.32,
+      "familia": "llama",
+      "parametros": "1.2B",
+      "cuantizacion": "Q8_0",
+      "digest": "baf6a787fdff"
+    },
+    {
+      "nombre": "llama3.2:3b",
+      "tamano_gb": 2.02,
+      "familia": "llama",
+      "parametros": "3.2B",
+      "cuantizacion": "Q4_K_M",
+      "digest": "a80c4f17acd5"
+    },
+    {
+      "nombre": "qwen2.5:1.5b",
+      "tamano_gb": 0.99,
+      "familia": "qwen2",
+      "parametros": "1.5B",
+      "cuantizacion": "Q4_K_M",
+      "digest": "65ec06548149"
+    }
+  ],
+  "plataforma": "Linux-5.15.133.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+  "paso": "generacion",
+  "modelos": [
+    "qwen2.5:1.5b",
+    "llama3.2:1b",
+    "llama3.2:3b"
+  ],
+  "conjunto": "todos"
+}

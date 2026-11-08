@@ -1,0 +1,122 @@
+# Pila completa del asistente RAG. Uso:
+#   CPU:        docker compose up -d --build
+#   GPU NVIDIA: docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+#
+# Límites de recursos: configurables en .env (ver .env.example). Los valores por
+# defecto caben en un equipo de 16 GB de RAM con los tres LLM del experimento.
+#
+# Milvus corre en modo standalone EMBEBIDO (modo oficial de standalone_embed.sh):
+# etcd va dentro del mismo contenedor y los datos se guardan en disco local, en el
+# volumen milvus_data. No se usa MinIO porque su imagen oficial dejó de distribuirse
+# en Docker Hub (sept. 2026); ver README, sección "Decisiones de arquitectura".
+
+x-logs: &logs
+  logging:
+    driver: json-file
+    options: {max-size: "10m", max-file: "3"}   # logs rotados: máx. 30 MB por servicio
+
+services:
+  milvus:
+    container_name: rag-milvus
+    image: milvusdb/milvus:v2.6.6
+    command: ["milvus", "run", "standalone"]
+    security_opt: ["seccomp:unconfined"]
+    environment:
+      ETCD_USE_EMBED: "true"                              # etcd dentro del contenedor
+      ETCD_DATA_DIR: /var/lib/milvus/etcd
+      ETCD_CONFIG_PATH: /milvus/configs/embedEtcd.yaml
+      COMMON_STORAGETYPE: local                           # segmentos en disco local, sin MinIO
+      DEPLOY_MODE: STANDALONE
+    volumes:
+      - milvus_data:/var/lib/milvus                       # metadatos (etcd) + vectores: persistentes
+      - ./milvus/embedEtcd.yaml:/milvus/configs/embedEtcd.yaml:ro
+      - ./milvus/user.yaml:/milvus/configs/user.yaml:ro
+    ports: ["${BIND_ADDR:-127.0.0.1}:19530:19530", "${BIND_ADDR:-127.0.0.1}:9091:9091"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 20s
+      timeout: 10s
+      start_period: 90s
+      retries: 10
+    deploy:
+      resources:
+        limits: {cpus: "${MILVUS_CPUS:-2}", memory: "${MILVUS_MEM:-4g}"}
+    restart: unless-stopped
+    <<: *logs
+
+  ollama:
+    container_name: rag-ollama
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    environment:
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-10m}      # tiempo que un modelo queda en memoria tras usarse
+      OLLAMA_MAX_LOADED_MODELS: "${OLLAMA_MAX_LOADED_MODELS:-1}"  # al cambiar de LLM se libera el anterior
+      OLLAMA_NUM_PARALLEL: "${OLLAMA_NUM_PARALLEL:-1}"  # una petición a la vez: latencias comparables
+    volumes: [ollama_data:/root/.ollama]                # pesos persistentes: no se re-descargan
+    ports: ["${BIND_ADDR:-127.0.0.1}:11434:11434"]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 20s
+      timeout: 10s
+      start_period: 20s
+      retries: 5
+    deploy:
+      resources:
+        limits: {cpus: "${OLLAMA_CPUS:-4}", memory: "${OLLAMA_MEM:-6g}"}
+    restart: unless-stopped
+    <<: *logs
+
+  api:
+    container_name: rag-api
+    build: .
+    image: rag-milvus-taller:${APP_VERSION:-1.0.0}
+    command: uvicorn app.api:app --host 0.0.0.0 --port 8000 --workers 1
+    env_file: .env
+    environment:
+      MILVUS_URI: http://milvus:19530
+      OLLAMA_URL: http://ollama:11434
+    ports: ["${BIND_ADDR:-127.0.0.1}:8000:8000"]
+    volumes:
+      - ./data:/work/data:ro            # corpus, vectores.parquet y encoder_config.json (solo lectura)
+      - ./reports:/work/reports         # logs JSONL de cada ejecución y resultados
+      - hf_cache:/cache/huggingface     # pesos del encoder: se descargan una sola vez
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 20s
+      timeout: 5s
+      start_period: 180s                # primera vez descarga el encoder (~470 MB)
+      retries: 5
+    depends_on:
+      milvus: {condition: service_healthy}
+      ollama: {condition: service_healthy}
+    deploy:
+      resources:
+        limits: {cpus: "${API_CPUS:-2}", memory: "${API_MEM:-3g}"}
+    restart: unless-stopped
+    <<: *logs
+
+  frontend:
+    container_name: rag-frontend
+    build: .                            # misma imagen que la API (la caché hace que no se reconstruya)
+    image: rag-milvus-taller:${APP_VERSION:-1.0.0}
+    command: streamlit run app/frontend.py --server.address=0.0.0.0 --server.port=8501 --browser.gatherUsageStats=false
+    environment:
+      API_URL: http://api:8000
+      FRONTEND_TIMEOUT_SECONDS: ${FRONTEND_TIMEOUT_SECONDS:-330}
+    ports: ["${BIND_ADDR:-127.0.0.1}:8501:8501"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      api: {condition: service_healthy}
+    deploy:
+      resources:
+        limits: {cpus: "${FRONTEND_CPUS:-1}", memory: "${FRONTEND_MEM:-512m}"}
+    restart: unless-stopped
+    <<: *logs
+
+volumes:
+  milvus_data:
+  ollama_data:
+  hf_cache:
