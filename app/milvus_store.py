@@ -89,6 +89,35 @@ def asegurar_coleccion(recrear: bool = False) -> bool:
     return True
 
 
+LIMITE_JSON = 65_000   # Milvus rechaza campos JSON de más de 65.536 bytes
+
+
+def compactar_provenance(prov: list, limite: int = LIMITE_JSON) -> list:
+    """Reduce `provenance` hasta que quepa en el campo JSON de Milvus.
+
+    Un párrafo repetido (avisos de cookies, firmas) puede aparecer en cientos de documentos
+    de la muestra de 10.000. Se quitan primero los campos accesorios y se conserva siempre
+    el `document_id` de cada origen, que es lo que usa la evaluación con el gold. Solo si ni
+    así cabe, se recorta la lista y se deja al final una marca con el total de orígenes.
+    """
+    def tamano(x) -> int:
+        return len(json.dumps(x, ensure_ascii=False).encode("utf-8"))
+
+    if tamano(prov) <= limite:
+        return prov
+    for campos in (("document_id", "chunk_id", "char_start", "char_end"), ("document_id",)):
+        reducido = [{k: p[k] for k in campos if k in p} if isinstance(p, dict) else p for p in prov]
+        if tamano(reducido) <= limite:
+            return reducido
+    marca = {"_truncado": True, "total_origenes": len(prov)}
+    salida: list = []
+    for p in reducido:
+        if tamano(salida + [p, marca]) > limite:
+            break
+        salida.append(p)
+    return salida + [marca]
+
+
 def fila_a_registro(fila: dict, vector) -> dict:
     """Normaliza una fila (chunk + metadatos) al esquema de la colección."""
     prov = fila.get("provenance") or "[]"
@@ -100,8 +129,8 @@ def fila_a_registro(fila: dict, vector) -> dict:
         registro[campo] = truncar(fila.get(campo), LIMITES[campo])
     for campo in ["chunk_index", "char_start", "char_end", "n_tokens"]:
         registro[campo] = int(fila.get(campo) or 0)
-    registro["n_sources"] = int(fila.get("n_sources") or len(prov) or 1)
-    registro["provenance"] = prov
+    registro["n_sources"] = int(fila.get("n_sources") or len(prov) or 1)   # total real, aunque se compacte
+    registro["provenance"] = compactar_provenance(prov)
     return registro
 
 

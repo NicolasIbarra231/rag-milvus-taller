@@ -1,15 +1,4 @@
-failed to get console mode for stdout: The handle is invalid.
-qwen2.5:1.5b,rag-frontend,0.00%,43.41MiB / 512MiB
-qwen2.5:1.5b,rag-api,0.30%,757.7MiB / 3GiB
-qwen2.5:1.5b,rag-ollama,0.00%,1.415GiB / 6GiB
-qwen2.5:1.5b,rag-milvus,5.91%,348.6MiB / 4GiB
-failed to get console mode for stdout: The handle is invalid.
-llama3.2:1b,rag-frontend,0.00%,43.41MiB / 512MiB
-llama3.2:1b,rag-api,0.40%,757.7MiB / 3GiB
-llama3.2:1b,rag-ollama,0.01%,1.75GiB / 6GiB
-llama3.2:1b,rag-milvus,8.95%,348.8MiB / 4GiB
-failed to get console mode for stdout: The handle is invalid.
-llama3.2:3b,rag-frontend,0.00%,43.41MiB / 512MiB
-llama3.2:3b,rag-api,0.45%,757.8MiB / 3GiB
-llama3.2:3b,rag-ollama,0.01%,2.79GiB / 6GiB
-llama3.2:3b,rag-milvus,12.02%,349.1MiB / 4GiB
+﻿"modelo","ollama_reposo_mib","ollama_pico_mib","ollama_cpu_pico_pct","api_pico_mib","milvus_mib","frontend_mib","muestras","respuesta","ollama_ps","fecha_utc"
+"qwen2.5:1.5b","1722,4","1886,2","406,28","661,5","843,4","40,7","12","failed to get console mode for stdout: The handle is invalid. 200 27.584","qwen2.5:1.5b | 65ec06548149 | 1.2 GB | 100% CPU | 4096 | llamacpp | 9 minutes from now | ","2026-11-11T02:55:56.7961789Z"
+"llama3.2:1b","3183,6","3228,7","405,3","661","843,3","40,7","18","failed to get console mode for stdout: The handle is invalid. 200 39.974","llama3.2:1b | baf6a787fdff | 1.5 GB | 100% CPU | 4096 | llamacpp | 9 minutes from now | ","2026-11-11T02:56:48.4081646Z"
+"llama3.2:3b","5523,5","5339,1","404,59","661","843,4","40,7","27","failed to get console mode for stdout: The handle is invalid. 200 57.044","llama3.2:3b | a80c4f17acd5 | 2.6 GB | 100% CPU | 4096 | llamacpp | 9 minutes from now | ","2026-11-11T02:58:00.6887949Z"

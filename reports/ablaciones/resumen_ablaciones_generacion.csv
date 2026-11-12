@@ -1,0 +1,4 @@
+condicion,descripcion,exactitud,fidelidad,citas,contexto_con_relevante,total_p50_s,tokens_entrada_media,respuestas_recalificadas
+base,"Base (k = 5, diversificada)",0.412,1.92,0.56,0.7,34.621,1789.118,0
+ctx_convencional,Contexto convencional (k = 5),0.412,1.769,0.577,0.667,26.146,1789.382,23
+k3,"k = 3, diversificada",0.412,0.933,0.567,0.7,9.89,1180.5,34

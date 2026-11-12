@@ -1,0 +1,4 @@
+conjunto,modelo,n,errores,tasa_error,intentos,errores_en_intentos,tasa_error_intentos,abstencion_correcta,se_abstiene_sin_respuesta,abstencion_indebida,contexto_con_relevante,sin_citas,citas_inexistentes,precision_citas,total_p50_s,total_p95_s,recuperacion_p50_s,recuperacion_p95_s,generacion_p50_s,generacion_p95_s,tokens_por_s,tokens_entrada_media,arranques_en_frio_excluidos
+test,qwen2.5:1.5b,34,0,0.0,34,0,0.0,0.824,0.0,0.067,0.7,0.536,0.0,0.692,9.89,20.638,0.044,0.084,9.835,20.584,10.481,1180.5,0
+dev,qwen2.5:1.5b,12,0,0.0,12,0,0.0,0.917,0.5,0.0,0.7,0.3,0.0,0.429,8.856,20.93,0.053,0.084,8.8,20.877,10.255,1222.333,0
+todos,qwen2.5:1.5b,46,0,0.0,46,0,0.0,0.848,0.167,0.05,0.7,0.474,0.0,0.6,9.466,20.802,0.047,0.096,9.414,20.745,10.422,1191.413,0

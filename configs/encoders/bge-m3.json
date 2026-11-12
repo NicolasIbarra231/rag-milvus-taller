@@ -1,0 +1,15 @@
+{
+  "modelo": "BAAI/bge-m3",
+  "revision": "7b44caba5c06fd6f1ef1d2786261e636c38e4295",
+  "dimension": 1024,
+  "max_tokens": 8192,
+  "prefijo_query": "",
+  "prefijo_passage": "",
+  "normalizado": true,
+  "metrica_milvus": "COSINE",
+  "estrategia_chunks": "struct256o32",
+  "_nota": "Ablación de encoder: bge-m3 no usa prefijos. Los chunks se segmentan con el tokenizer de multilingual-e5-small para que sean idénticos a los de la colección base. Se fija una revisión del repositorio que trae model.safetensors y se exige ese formato: así no se usa torch.load, que transformers ya no permite con torch < 2.6 (CVE-2025-32434), y los pesos se cargan con menos memoria.",
+  "model_kwargs": {
+    "use_safetensors": true
+  }
+}

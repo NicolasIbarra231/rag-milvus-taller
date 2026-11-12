@@ -23,7 +23,10 @@ def modelo():
     from sentence_transformers import SentenceTransformer  # import tardío: pesado
 
     c = contrato()
-    m = SentenceTransformer(c["modelo"], device=settings().dispositivo_encoder, revision=c.get("revision"))
+    # model_kwargs (opcional en el contrato) va a transformers; p. ej. {"use_safetensors": true}
+    # obliga a cargar los pesos en safetensors, sin torch.load (que transformers exige torch >= 2.6).
+    m = SentenceTransformer(c["modelo"], device=settings().dispositivo_encoder, revision=c.get("revision"),
+                            model_kwargs=c.get("model_kwargs") or None)
     dim = m.get_sentence_embedding_dimension()
     if dim != int(c["dimension"]):
         raise ErrorContrato(

@@ -1,0 +1,4 @@
+conjunto,modelo,n,exactitud,correccion_media,fidelidad_media,citas_media,abstencion_correcta_sin_respuesta,respuestas_nuevas
+test,qwen2.5:1.5b,34,0.412,1.324,0.933,0.567,0.5,34
+dev,qwen2.5:1.5b,12,0.5,1.583,0.636,0.455,0.5,11
+todos,qwen2.5:1.5b,46,0.435,1.391,0.854,0.537,0.5,45

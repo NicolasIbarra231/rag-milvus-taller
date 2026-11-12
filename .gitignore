@@ -8,7 +8,14 @@ __pycache__/
 # Datos restringidos: el corpus y todo lo que contiene su texto NO se publica
 data/*.parquet
 data/muestras/
-# Resultados crudos y logs: se publican solo los anonimizados/curados en reports/
-reports/logs/
+# Trazas y resultados SÍ se publican (reports/logs/ y reports/eval/): el taller pide
+# resultados crudos y trazas. No contienen el texto de los chunks: solo preguntas,
+# respuestas, títulos, URLs e IDs.
+# Archivos sueltos de pruebas locales
 reports/*.jsonl
 reports/*.csv
+# Marcas de pasos de ejecutar_pendientes.ps1
+reports/.estado/
+# Vectores intermedios de las ablaciones (se regeneran)
+reports/ablaciones/*.parquet
+reports/ablaciones/encoder_config.json

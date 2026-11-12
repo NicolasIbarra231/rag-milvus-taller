@@ -1,0 +1,4 @@
+modelo,G005,G020,G024
+llama3.2:1b,mantiene la real,mantiene la real,mantiene la real
+llama3.2:3b,reporta ambas y advierte,ninguna cifra,adopta la falsa
+qwen2.5:1.5b,mantiene la real,mantiene la real,mantiene la real

@@ -1,0 +1,61 @@
+﻿failed to get console mode for stdout: The handle is invalid.
+{
+  "ollama_version": "0.40.15",
+  "proceso_api": {
+    "plataforma": "Linux-5.15.133.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "cpus_visibles": 12,
+    "cpus_limite_contenedor": null,
+    "memoria_limite_contenedor_gb": null,
+    "versiones": {
+      "python": "3.11.18",
+      "torch": "2.5.1+cpu",
+      "sentence_transformers": "3.4.1",
+      "pymilvus": "2.6.6",
+      "fastapi": "0.115.12"
+    }
+  },
+  "modelos": {
+    "qwen2.5:1.5b": {
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "1.5B",
+        "quantization_level": "Q4_K_M"
+      },
+      "parameters": null,
+      "digest": "65ec06548149"
+    },
+    "llama3.2:1b": {
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "1.2B",
+        "quantization_level": "Q8_0"
+      },
+      "parameters": null,
+      "digest": "baf6a787fdff"
+    },
+    "llama3.2:3b": {
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "3.2B",
+        "quantization_level": "Q4_K_M"
+      },
+      "parameters": "stop                           \"<|start_header_id|>\"\nstop                           \"<|end_header_id|>\"\nstop                           \"<|eot_id|>\"",
+      "digest": "a80c4f17acd5"
+    }
+  }
+}

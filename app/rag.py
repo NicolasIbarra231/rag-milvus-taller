@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from app import llm, prompts
+from app import entorno, llm, prompts
 from app.config import contrato, settings
 from app.retrieval import recuperar
 
@@ -43,7 +43,12 @@ def _evidencia_publica(fuente: dict, citadas: set[int]) -> dict:
 def preguntar(pregunta: str, modelo: str | None = None, k: int | None = None,
               estrategia: str | None = None, prompt_version: str | None = None,
               filtro: str = "", temperatura: float | None = None,
-              num_predict: int | None = None) -> dict:
+              num_predict: int | None = None,
+              inyectar: list[tuple[int, dict]] | None = None, registrar: bool = True) -> dict:
+    """Pipeline completo. `inyectar` y `registrar` existen solo para la evaluación de robustez:
+    `inyectar` = [(posición, evidencia sintética), ...] se inserta tras la recuperación, como
+    si Milvus hubiera devuelto un documento manipulado; `registrar=False` no escribe en el log.
+    """
     s = settings()
     modelo = modelo or s.modelo_por_defecto
     k = k or s.k_por_defecto
@@ -59,6 +64,8 @@ def preguntar(pregunta: str, modelo: str | None = None, k: int | None = None,
 
     # 1. Recuperar
     evidencias, met_rec = recuperar(pregunta, k=k, estrategia=estrategia, filtro=filtro)
+    for posicion, evidencia in sorted(inyectar or [], key=lambda x: x[0]):
+        evidencias.insert(max(0, posicion - 1), evidencia)
 
     # 2. Ensamblar contexto con presupuesto
     contexto, fuentes, truncado = prompts.construir_contexto(evidencias, s.max_contexto_chars)
@@ -127,6 +134,7 @@ def preguntar(pregunta: str, modelo: str | None = None, k: int | None = None,
         },
         "encoder": contrato()["modelo"],
         "coleccion": s.coleccion,
+        "entorno": entorno.para_registro(modelo),
         "advertencias": advertencias,
     }
 
@@ -136,6 +144,7 @@ def preguntar(pregunta: str, modelo: str | None = None, k: int | None = None,
         {"referencia": e["referencia"], "chunk_id": e["chunk_id"], "document_id": e["document_id"],
          "score": e["score"], "citada": e["citada"]} for e in resultado["evidencias"]
     ]
-    registrar_ejecucion(registro)
+    if registrar:
+        registrar_ejecucion(registro)
     log.info("ask run=%s modelo=%s total=%.2fs citas=%s", run_id, modelo, total, citas["estado"])
     return resultado

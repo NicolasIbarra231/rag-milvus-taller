@@ -138,13 +138,35 @@ def guardar_configuracion(api: Api, gold: Path, salida: Path, extra: dict) -> No
 
 
 # ------------------------------------------------------------------ recuperación
-def nombre_recuperacion(estrategia: str | None) -> str:
+def nombre_recuperacion(estrategia: str | None, etiqueta: str | None = None) -> str:
+    if etiqueta:
+        return f"recuperacion_{etiqueta}"
     return "recuperacion" if not estrategia else f"recuperacion_{estrategia}"
 
 
+def nombre_generacion(etiqueta: str | None) -> str:
+    return "generacion_crudo.jsonl" if not etiqueta else f"generacion_{etiqueta}_crudo.jsonl"
+
+
+def cobertura_local():
+    """En modo --local: qué document_id del gold existen en la colección configurada."""
+    from app import milvus_store
+    from app.config import settings
+
+    def presentes(ids: set[str]) -> set[str]:
+        if not ids:
+            return set()
+        lista = ", ".join(json.dumps(i) for i in sorted(ids))
+        filas = milvus_store.cliente().query(settings().coleccion, filter=f"document_id in [{lista}]",
+                                             output_fields=["document_id"], limit=16384)
+        return {f["document_id"] for f in filas}
+    return presentes
+
+
 def correr_recuperacion(api: Api, preguntas: list[dict], k_max: int, salida: Path,
-                        estrategia: str | None = None) -> pd.DataFrame:
-    nombre = nombre_recuperacion(estrategia)
+                        estrategia: str | None = None, etiqueta: str | None = None,
+                        cobertura=None) -> pd.DataFrame:
+    nombre = nombre_recuperacion(estrategia, etiqueta)
     ks = tuple(sorted({k for k in KS_POR_DEFECTO if k <= k_max} | {k_max}))
     crudo, filas = [], []
     for n, q in enumerate(preguntas, 1):
@@ -164,10 +186,13 @@ def correr_recuperacion(api: Api, preguntas: list[dict], k_max: int, salida: Pat
         crudo.append({"gold_id": q["gold_id"], "split": q["split"], "tipo": q["tipo"],
                       "pregunta": q["pregunta"], "relevantes": q["relevantes"], "ranking": ranking,
                       "metricas": met, "tiempos": r.get("metricas")})
-        filas.append({"gold_id": q["gold_id"], "split": q["split"], "tipo": q["tipo"],
-                      "idioma_pregunta": q.get("idioma_pregunta"), "n_relevantes": len(q["relevantes"]),
-                      "recuperacion_s": (r.get("metricas") or {}).get("tiempo_recuperacion_s"),
-                      **(met or {})})
+        fila = {"gold_id": q["gold_id"], "split": q["split"], "tipo": q["tipo"],
+                "idioma_pregunta": q.get("idioma_pregunta"), "n_relevantes": len(q["relevantes"]),
+                "recuperacion_s": (r.get("metricas") or {}).get("tiempo_recuperacion_s"),
+                "busqueda_s": (r.get("metricas") or {}).get("tiempo_busqueda_s"), **(met or {})}
+        if cobertura is not None:
+            fila["relevantes_en_coleccion"] = len(cobertura(set(q["relevantes"])))
+        filas.append(fila)
         marca = "sin relevantes (sin_respuesta)" if met is None else (
             f"primer relevante en rango {met['rango_primer_relevante']}" if met["rango_primer_relevante"]
             else f"ningún relevante en top-{k_max}")
@@ -230,8 +255,10 @@ def registro_generacion(q: dict, modelo: str, res: dict) -> dict:
     }
 
 
-def correr_generacion(api: Api, preguntas: list[dict], modelos: list[str], salida: Path) -> None:
-    ruta = salida / "generacion_crudo.jsonl"
+def correr_generacion(api: Api, preguntas: list[dict], modelos: list[str], salida: Path,
+                      etiqueta: str | None = None, k: int | None = None, estrategia: str | None = None) -> None:
+    ruta = salida / nombre_generacion(etiqueta)
+    extra = {c: v for c, v in (("k", k), ("estrategia", estrategia)) if v}
     hechos = {(f["gold_id"], f["modelo"]) for f in leer_jsonl(ruta) if not f.get("error")}
     instalados = {m["nombre"] for m in api.get("/models")["instalados"]}
     faltan = [m for m in modelos if m not in instalados]
@@ -259,7 +286,7 @@ def correr_generacion(api: Api, preguntas: list[dict], modelos: list[str], salid
         inicio = time.perf_counter()
         for n, q in enumerate(pendientes, 1):
             try:
-                res = api.post("/ask", {"query": q["pregunta"], "model": modelo}, timeout=TIMEOUT_ASK)
+                res = api.post("/ask", {"query": q["pregunta"], "model": modelo, **extra}, timeout=TIMEOUT_ASK)
                 fila = registro_generacion(q, modelo, res)
                 estado = f"{fila['tiempos']['total_s']:.1f} s · {fila['estado_citas']}"
             except ErrorApi as e:
@@ -280,9 +307,15 @@ def correr_generacion(api: Api, preguntas: list[dict], modelos: list[str], salid
 
 
 def resumen_generacion(filas: list[dict]) -> pd.DataFrame:
+    """Una fila por modelo y conjunto. `errores`/`tasa_error` = respuestas que quedaron fallidas;
+    `intentos`/`tasa_error_intentos` = todas las llamadas, incluidas las que fallaron y se repitieron."""
     ultimas = list(ultima_por_clave(filas).values())
     bloques = []
     for conjunto in CONJUNTOS:
+        intentos = defaultdict(list)
+        for f in filas:
+            if conjunto == "todos" or f["split"] == conjunto:
+                intentos[f["modelo"]].append(f)
         parte = [f for f in ultimas if conjunto == "todos" or f["split"] == conjunto]
         por_modelo = defaultdict(list)
         for f in parte:
@@ -297,6 +330,10 @@ def resumen_generacion(filas: list[dict]) -> pd.DataFrame:
             bloques.append({
                 "conjunto": conjunto, "modelo": modelo, "n": len(fs), "errores": len(fs) - len(ok),
                 "tasa_error": (len(fs) - len(ok)) / len(fs) if fs else None,
+                "intentos": len(intentos[modelo]),
+                "errores_en_intentos": sum(1 for f in intentos[modelo] if f.get("error")),
+                "tasa_error_intentos": (sum(1 for f in intentos[modelo] if f.get("error")) / len(intentos[modelo])
+                                        if intentos[modelo] else None),
                 "abstencion_correcta": media([f["abstencion_correcta_auto"] for f in ok]),
                 "se_abstiene_sin_respuesta": media([f["abstencion_detectada"] for f in sin_resp]),
                 "abstencion_indebida": media([f["abstencion_detectada"] for f in con_resp]),
@@ -307,6 +344,7 @@ def resumen_generacion(filas: list[dict]) -> pd.DataFrame:
                 "total_p50_s": percentil([f["tiempos"]["total_s"] for f in calientes], 50),
                 "total_p95_s": percentil([f["tiempos"]["total_s"] for f in calientes], 95),
                 "recuperacion_p50_s": percentil([f["tiempos"]["recuperacion_s"] for f in calientes], 50),
+                "recuperacion_p95_s": percentil([f["tiempos"]["recuperacion_s"] for f in calientes], 95),
                 "generacion_p50_s": percentil([f["tiempos"]["generacion_s"] for f in calientes], 50),
                 "generacion_p95_s": percentil([f["tiempos"]["generacion_s"] for f in calientes], 95),
                 "tokens_por_s": media([f["tokens"]["por_segundo"] for f in calientes
@@ -341,6 +379,8 @@ RUBRICA = [
 
 def elegir_doble(preguntas: list[dict], fraccion: float, semilla: int = 42) -> set[str]:
     """Submuestra para el segundo evaluador, estratificada por tipo (al menos una por tipo)."""
+    if fraccion <= 0:
+        return set()
     rnd = random.Random(semilla)
     por_tipo = defaultdict(list)
     for q in preguntas:
@@ -515,10 +555,69 @@ def resumir_calificaciones(ruta: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     return pd.DataFrame(promedios).round(3), pd.DataFrame(acuerdo).round(3)
 
 
+# ------------------------------------------------- ablaciones de la generación
+def leer_notas(ruta: Path, hoja: str = "Evaluador 1") -> pd.DataFrame:
+    df = pd.read_excel(ruta, sheet_name=hoja)
+    for c in CRITERIOS:
+        df[c] = df[c].map(_normalizar_nota)
+    return df
+
+
+def separar_ablacion(base: list[dict], ablacion: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Con temperatura 0 y semilla fija, mismo contexto => misma respuesta.
+
+    Devuelve (reutilizables, por_calificar): una respuesta de la ablación se reutiliza si su
+    contexto (huella) y su texto son idénticos a los de la corrida base para la misma
+    pregunta y el mismo modelo; si no, hay que calificarla.
+    """
+    b = {k: f for k, f in ultima_por_clave(base).items() if not f.get("error")}
+    reutilizables, por_calificar = [], []
+    for clave, f in sorted(ultima_por_clave(ablacion).items()):
+        if f.get("error"):
+            continue
+        previa = b.get(clave)
+        igual = (previa is not None and (previa.get("contexto") or {}).get("huella") == (f.get("contexto") or {}).get("huella")
+                 and (previa.get("respuesta") or "").strip() == (f.get("respuesta") or "").strip())
+        (reutilizables if igual else por_calificar).append(f)
+    return reutilizables, por_calificar
+
+
+def metricas_humanas(df: pd.DataFrame) -> dict:
+    """Las cuatro medidas de la regla de decisión sobre un conjunto de filas calificadas."""
+    sin = df[df["tipo"] == "sin_respuesta"]
+    return {
+        "n": len(df),
+        "exactitud": (df["Corrección (0-3)"] == 3).mean() if len(df) else None,
+        "correccion_media": df["Corrección (0-3)"].mean(),
+        "fidelidad_media": df["Fidelidad (0-3)"].mean(),
+        "citas_media": df["Citas (0-3)"].mean(),
+        "abstencion_correcta_sin_respuesta": sin["Abstención correcta"].mean() if len(sin) else None,
+    }
+
+
+def calificaciones_ablacion(base_planilla: Path, planilla_ablacion: Path, reutilizadas: Path) -> pd.DataFrame:
+    base = leer_notas(base_planilla)
+    nuevas = leer_notas(planilla_ablacion) if planilla_ablacion.is_file() else base.iloc[0:0]
+    reuso = pd.read_csv(reutilizadas) if reutilizadas.is_file() else pd.DataFrame(columns=["gold_id", "modelo"])
+    heredadas = base.merge(reuso[["gold_id", "modelo"]], on=["gold_id", "modelo"])
+    pendientes = nuevas[nuevas["Corrección (0-3)"].isna()]
+    if len(pendientes):
+        print(f"  Aviso: {len(pendientes)} respuestas de la ablación aún no tienen nota; se excluyen.")
+    todas = pd.concat([heredadas, nuevas.dropna(subset=["Corrección (0-3)"])], ignore_index=True)
+    filas = []
+    for conjunto in CONJUNTOS:
+        parte = todas if conjunto == "todos" else todas[todas["split"] == conjunto]
+        for modelo, g in parte.groupby("modelo"):
+            filas.append({"conjunto": conjunto, "modelo": modelo, **metricas_humanas(g),
+                          "respuestas_nuevas": int(g.index.isin(todas.index[len(heredadas):]).sum())})
+    return pd.DataFrame(filas).round(3)
+
+
 # --------------------------------------------------------------------------- CLI
 def main(argv=None, sesion=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("paso", choices=["recuperacion", "generacion", "planilla", "resumen", "calificaciones", "todo"])
+    p.add_argument("paso", choices=["recuperacion", "generacion", "planilla", "resumen", "calificaciones", "todo",
+                                     "planilla-ablacion", "calificaciones-ablacion"])
     p.add_argument("--gold", type=Path, default=GOLD_POR_DEFECTO)
     p.add_argument("--salida", type=Path, default=SALIDA_POR_DEFECTO)
     p.add_argument("--api", default=API_POR_DEFECTO)
@@ -529,10 +628,23 @@ def main(argv=None, sesion=None) -> int:
                    help="Ablación de recuperación; por defecto, la de la API (diversificada)")
     p.add_argument("--fraccion-doble", type=float, default=0.3, help="Submuestra para el segundo evaluador")
     p.add_argument("--planilla", type=Path, help="Planilla calificada (paso calificaciones)")
+    p.add_argument("--etiqueta", help="Nombre de la condición de ablación (archivos *_<etiqueta>*)")
+    p.add_argument("--k", type=int, help="Generación: k de la API para esta condición (ablación)")
+    p.add_argument("--local", action="store_true",
+                   help="Sin servidor HTTP: usa la API en este proceso, con la colección y el encoder del entorno "
+                        "(MILVUS_COLLECTION, ENCODER_CONFIG). Para ablaciones de chunk, encoder y muestra")
     a = p.parse_args(argv)
     if not 1 <= a.k_max <= 15:
         sys.exit("--k-max debe estar entre 1 y 15 (límite de la API).")
 
+    cobertura = None
+    if a.local and sesion is None:
+        from fastapi.testclient import TestClient
+
+        import app.api
+        sesion, a.api = TestClient(app.api.app), ""
+    if a.local:
+        cobertura = cobertura_local()
     api = Api(a.api, sesion)
     preguntas = leer_gold(a.gold, a.conjunto)
     pasos = ["recuperacion", "generacion", "planilla", "resumen"] if a.paso == "todo" else [a.paso]
@@ -547,21 +659,27 @@ def main(argv=None, sesion=None) -> int:
               f"conjunto '{a.conjunto}')", flush=True)
 
     if "recuperacion" in pasos:
-        nombre = nombre_recuperacion(a.estrategia)
+        nombre = nombre_recuperacion(a.estrategia, a.etiqueta)
         guardar_configuracion(api, a.gold, a.salida, {"paso": nombre, "k_max": a.k_max,
                                                        "estrategia": a.estrategia or "por defecto",
-                                                       "conjunto": a.conjunto})
-        print(f"\nRecuperación (top-{a.k_max}, estrategia {a.estrategia or 'por defecto'}):", flush=True)
-        df = correr_recuperacion(api, preguntas, a.k_max, a.salida, a.estrategia)
+                                                       "etiqueta": a.etiqueta, "conjunto": a.conjunto})
+        print(f"\nRecuperación (top-{a.k_max}, estrategia {a.estrategia or 'por defecto'}"
+              f"{', condición ' + a.etiqueta if a.etiqueta else ''}):", flush=True)
+        df = correr_recuperacion(api, preguntas, a.k_max, a.salida, a.estrategia, a.etiqueta, cobertura)
+        if cobertura is not None:
+            total = int(df["n_relevantes"].sum())
+            print(f"Cobertura del gold en la colección: {int(df['relevantes_en_coleccion'].sum())} de {total} "
+                  "documentos relevantes indexados.")
         res = resumen_recuperacion(df)
         res.to_csv(a.salida / f"resumen_{nombre}.csv", index=False, encoding="utf-8")
         print("\n" + res.to_string(index=False))
 
     if "generacion" in pasos:
         modelos = a.modelos or api.get("/config")["modelos_experimento"]
-        guardar_configuracion(api, a.gold, a.salida, {"paso": "generacion", "modelos": modelos,
-                                                       "conjunto": a.conjunto})
-        correr_generacion(api, preguntas, modelos, a.salida)
+        paso = "generacion" if not a.etiqueta else f"generacion_{a.etiqueta}"
+        guardar_configuracion(api, a.gold, a.salida, {"paso": paso, "modelos": modelos, "k": a.k,
+                                                       "estrategia": a.estrategia, "conjunto": a.conjunto})
+        correr_generacion(api, preguntas, modelos, a.salida, a.etiqueta, a.k, a.estrategia)
 
     if "planilla" in pasos:
         gold_completo = leer_gold(a.gold, "todos")
@@ -573,14 +691,38 @@ def main(argv=None, sesion=None) -> int:
               f"({len(info['preguntas_doble'])} preguntas en doble evaluación).")
 
     if "resumen" in pasos:
-        filas = leer_jsonl(a.salida / "generacion_crudo.jsonl")
+        filas = leer_jsonl(a.salida / nombre_generacion(a.etiqueta))
         if not filas:
             sys.exit("No hay resultados de generación todavía.")
         res = resumen_generacion(filas)
-        res.to_csv(a.salida / "resumen_generacion.csv", index=False, encoding="utf-8")
+        sufijo = f"_{a.etiqueta}" if a.etiqueta else ""
+        res.to_csv(a.salida / f"resumen_generacion{sufijo}.csv", index=False, encoding="utf-8")
         with pd.option_context("display.width", 250, "display.max_columns", 30):
             print("\nGeneración (detector automático; la calificación humana es la referencia):")
             print(res.to_string(index=False))
+
+    if a.paso == "planilla-ablacion":
+        if not a.etiqueta:
+            sys.exit("Indique --etiqueta (la condición de la ablación).")
+        base = leer_jsonl(a.salida / "generacion_crudo.jsonl")
+        abl = leer_jsonl(a.salida / nombre_generacion(a.etiqueta))
+        reutilizables, por_calificar = separar_ablacion(base, abl)
+        pd.DataFrame([{"gold_id": f["gold_id"], "modelo": f["modelo"]} for f in reutilizables],
+                     columns=["gold_id", "modelo"]).to_csv(a.salida / f"reutilizadas_{a.etiqueta}.csv", index=False)
+        ruta = a.salida / f"planilla_{a.etiqueta}.xlsx"
+        if por_calificar:
+            construir_planilla(leer_gold(a.gold, "todos"), por_calificar, ruta, 0)
+        print(f"Ablación '{a.etiqueta}': {len(reutilizables)} respuestas idénticas a la base (heredan su nota) y "
+              f"{len(por_calificar)} por calificar" + (f" en {ruta}" if por_calificar else "") + ".")
+
+    if a.paso == "calificaciones-ablacion":
+        if not a.etiqueta:
+            sys.exit("Indique --etiqueta (la condición de la ablación).")
+        res = calificaciones_ablacion(a.planilla or a.salida / "planilla_evaluacion.xlsx",
+                                      a.salida / f"planilla_{a.etiqueta}.xlsx",
+                                      a.salida / f"reutilizadas_{a.etiqueta}.csv")
+        res.to_csv(a.salida / f"calificaciones_{a.etiqueta}.csv", index=False, encoding="utf-8")
+        print(f"\nCalificación humana, condición '{a.etiqueta}':\n" + res.to_string(index=False))
 
     if a.paso == "calificaciones":
         ruta = a.planilla or a.salida / "planilla_evaluacion.xlsx"

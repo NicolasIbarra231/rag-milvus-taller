@@ -1,0 +1,404 @@
+﻿**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261109213943
+Nombre de usuario: NIBARRA\Nicol
+Usuario RunAs: NIBARRA\Nicol
+Nombre de la configuración: 
+Máquina: NIBARRA (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\ejecutar_pendientes.ps1
+Id. de proceso: 31352
+PSVersion: 5.1.26100.8457
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8457
+BuildVersion: 10.0.26100.8457
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+==================== [entorno] 21:39:44 ====================
+
+[entorno] listo en 0,3 min
+
+==================== [corpus] 21:40:04 ====================
+
+
+PS>ErrorTerminación(): "El paso 'corpus' falló (código 1). Corrija y vuelva a ejecutar el script."
+>> ErrorTerminación(): "El paso 'corpus' falló (código 1). Corrija y vuelva a ejecutar el script."
+El paso 'corpus' falló (código 1). Corrija y vuelva a ejecutar el script.
+El paso 'corpus' falló (código 1). Corrija y vuelva a ejecutar el script.
+En C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller 4\rag_milvus_taller\rag_milvus_taller\scripts\ejecutar_pendientes.ps1:
+38 Carácter: 32
++ ... DE -ne 0) { throw "El paso '$nombre' falló (código $LASTEXITCODE). Co ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (El paso 'corpus...utar el script.:String) [], RuntimeException
+    + FullyQualifiedErrorId : El paso 'corpus' falló (código 1). Corrija y vuelva a ejecutar el script.
+
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261109214045
+**********************
+**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261109214938
+Nombre de usuario: NIBARRA\Nicol
+Usuario RunAs: NIBARRA\Nicol
+Nombre de la configuración: 
+Máquina: NIBARRA (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\ejecutar_pendientes.ps1
+Id. de proceso: 34516
+PSVersion: 5.1.26100.8457
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8457
+BuildVersion: 10.0.26100.8457
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+[entorno] ya hecho (borre reports\.estado\entorno.ok para repetirlo).
+
+==================== [corpus] 21:49:40 ====================
+Ya existe data\documentos_rag.parquet.
+[corpus] listo en 0,0 min
+
+==================== [base_corpus] 21:49:40 ====================
+
+PS>ErrorTerminación(): "El paso 'base_corpus' falló (código 1). Corrija y vuelva a ejecutar el script."
+>> ErrorTerminación(): "El paso 'base_corpus' falló (código 1). Corrija y vuelva a ejecutar el script."
+El paso 'base_corpus' falló (código 1). Corrija y vuelva a ejecutar el script.
+El paso 'base_corpus' falló (código 1). Corrija y vuelva a ejecutar el script.
+En C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller 4\rag_milvus_taller\rag_milvus_taller\scripts\ejecutar_pendientes.ps1:
+38 Carácter: 32
++ ... DE -ne 0) { throw "El paso '$nombre' falló (código $LASTEXITCODE). Co ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (El paso 'base_c...utar el script.:String) [], RuntimeException
+    + FullyQualifiedErrorId : El paso 'base_corpus' falló (código 1). Corrija y vuelva a ejecutar el script.
+
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261109214945
+**********************
+**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261109215416
+Nombre de usuario: NIBARRA\Nicol
+Usuario RunAs: NIBARRA\Nicol
+Nombre de la configuración: 
+Máquina: NIBARRA (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\ejecutar_pendientes.ps1
+Id. de proceso: 31260
+PSVersion: 5.1.26100.8457
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8457
+BuildVersion: 10.0.26100.8457
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+[entorno] ya hecho (borre reports\.estado\entorno.ok para repetirlo).
+
+==================== [corpus] 21:54:17 ====================
+
+
+[corpus] listo en 0,2 min
+
+==================== [base_corpus] 21:54:30 ====================
+{
+  "modo": "from-corpus",
+  "archivo": "data/documentos_rag.parquet",
+  "sha256_corpus": "f4a669f17eaedd357f72b70c2192e685b6d534a94f6ffaeadbced7290b181728",
+  "documentos": 500,
+  "huella_ids": "4397e40ea9ff0408",
+  "chunks": 2248,
+  "huella_vectores": "af4bacf798f8ba6d",
+  "segundos_embeddings": 273.3,
+  "tokenizer": "intfloat/multilingual-e5-small",
+  "coleccion_creada": true,
+  "upserts": 2248,
+  "segundos": 1.9,
+  "verificacion": {
+    "coleccion": "rag_struct256_e5_corpus",
+    "existe": true,
+    "registros": 2248,
+    "dimension": 384,
+    "esperados": 2248,
+    "conteo_ok": true,
+    "dimension_ok": true,
+    "busqueda_control_ok": true,
+    "busqueda_control_score": 1.0
+  }
+}
+     dev    temporal  1  0.000  0.000  0.000  0.000   0.000   0.000   0.000   0.000     0.000     0.000     0.000     0.000 0.000
+   todos       todas 40  0.675  0.700  0.700  0.725   0.675   0.668   0.677   0.680     0.565     0.627     0.664     0.692 0.692
+   todos     ambigua  3  0.667  0.667  0.667  0.667   0.667   0.490   0.539   0.506     0.078     0.156     0.311     0.389 0.667
+   todos comparativa  4  0.750  0.750  0.750  1.000   0.750   0.653   0.713   0.767     0.312     0.562     0.750     0.875 0.792
+   todos     directa 28  0.679  0.714  0.714  0.714   0.679   0.701   0.701   0.701     0.647     0.692     0.701     0.714 0.696
+   todos    temporal  5  0.600  0.600  0.600  0.600   0.600   0.600   0.600   0.600     0.600     0.600     0.600     0.600 0.600
+[base_corpus] listo en 5,4 min
+
+==================== [chunk128] 21:59:55 ====================
+
+
+[chunk128] listo en 5,1 min
+
+==================== [chunk512] 22:04:59 ====================
+
+
+[chunk512] listo en 5,4 min
+
+==================== [bge_m3] 22:10:21 ====================
+
+PS>ErrorTerminación(): "El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script."
+>> ErrorTerminación(): "El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script."
+El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script.
+El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script.
+En C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller
+4\rag_milvus_taller\rag_milvus_taller\scripts\ejecutar_pendientes.ps1: 38 Carácter: 32
++ ... DE -ne 0) { throw "El paso '$nombre' falló (código $LASTEXITCODE). Co ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (El paso 'bge_m3...utar el script.:String) [], RuntimeException
+    + FullyQualifiedErrorId : El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script.
+
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261109222138
+**********************
+**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261110182357
+Nombre de usuario: NIBARRA\Nicol
+Usuario RunAs: NIBARRA\Nicol
+Nombre de la configuración: 
+Máquina: NIBARRA (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\ejecutar_pendientes.ps1
+Id. de proceso: 27764
+PSVersion: 5.1.26100.9168
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9168
+BuildVersion: 10.0.26100.9168
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+[entorno] ya hecho (borre reports\.estado\entorno.ok para repetirlo).
+
+[corpus] ya hecho (borre reports\.estado\corpus.ok para repetirlo).
+
+[base_corpus] ya hecho (borre reports\.estado\base_corpus.ok para repetirlo).
+
+[chunk128] ya hecho (borre reports\.estado\chunk128.ok para repetirlo).
+
+[chunk512] ya hecho (borre reports\.estado\chunk512.ok para repetirlo).
+
+==================== [bge_m3] 18:23:58 ====================
+
+PS>ErrorTerminación(): "El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script."
+>> ErrorTerminación(): "El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script."
+El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script.
+El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script.
+En C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller
+4\rag_milvus_taller\rag_milvus_taller\scripts\ejecutar_pendientes.ps1: 38 Carácter: 32
++ ... DE -ne 0) { throw "El paso '$nombre' falló (código $LASTEXITCODE). Co ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (El paso 'bge_m3...utar el script.:String) [], RuntimeException
+    + FullyQualifiedErrorId : El paso 'bge_m3' falló (código 1). Corrija y vuelva a ejecutar el script.
+
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261110182646
+**********************
+**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261110183542
+Nombre de usuario: NIBARRA\Nicol
+Usuario RunAs: NIBARRA\Nicol
+Nombre de la configuración: 
+Máquina: NIBARRA (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\ejecutar_pendientes.ps1
+Id. de proceso: 17716
+PSVersion: 5.1.26100.9168
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9168
+BuildVersion: 10.0.26100.9168
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+[entorno] ya hecho (borre reports\.estado\entorno.ok para repetirlo).
+
+[corpus] ya hecho (borre reports\.estado\corpus.ok para repetirlo).
+
+[base_corpus] ya hecho (borre reports\.estado\base_corpus.ok para repetirlo).
+
+[chunk128] ya hecho (borre reports\.estado\chunk128.ok para repetirlo).
+
+[chunk512] ya hecho (borre reports\.estado\chunk512.ok para repetirlo).
+
+==================== [bge_m3] 18:35:44 ====================
+    "coleccion": "rag_struct256_bgem3",
+    "existe": true,
+    "registros": 2248,
+    "dimension": 1024,
+    "esperados": 2248,
+    "conteo_ok": true,
+    "dimension_ok": true,
+    "busqueda_control_ok": true,
+    "busqueda_control_score": 1.0
+  }
+}
+
+[bge_m3] listo en 35,1 min
+
+==================== [muestra10k] 19:10:52 ====================
+
+PS>ErrorTerminación(): "El paso 'muestra10k' falló (código 1). Corrija y vuelva a ejecutar el script."
+>> ErrorTerminación(): "El paso 'muestra10k' falló (código 1). Corrija y vuelva a ejecutar el script."
+El paso 'muestra10k' falló (código 1). Corrija y vuelva a ejecutar el script.
+El paso 'muestra10k' falló (código 1). Corrija y vuelva a ejecutar el script.
+En C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller 4\rag_milvus_taller\rag_milvus_taller\scripts\ejecutar_pendientes.ps1:
+38 Carácter: 32
++ ... DE -ne 0) { throw "El paso '$nombre' falló (código $LASTEXITCODE). Co ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (El paso 'muestr...utar el script.:String) [], RuntimeException
+    + FullyQualifiedErrorId : El paso 'muestra10k' falló (código 1). Corrija y vuelva a ejecutar el script.
+
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261110195745
+**********************
+**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261110200702
+Nombre de usuario: NIBARRA\Nicol
+Usuario RunAs: NIBARRA\Nicol
+Nombre de la configuración: 
+Máquina: NIBARRA (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\ejecutar_pendientes.ps1
+Id. de proceso: 7584
+PSVersion: 5.1.26100.9168
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9168
+BuildVersion: 10.0.26100.9168
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+[entorno] ya hecho (borre reports\.estado\entorno.ok para repetirlo).
+
+[corpus] ya hecho (borre reports\.estado\corpus.ok para repetirlo).
+
+[base_corpus] ya hecho (borre reports\.estado\base_corpus.ok para repetirlo).
+
+[chunk128] ya hecho (borre reports\.estado\chunk128.ok para repetirlo).
+
+[chunk512] ya hecho (borre reports\.estado\chunk512.ok para repetirlo).
+
+[bge_m3] ya hecho (borre reports\.estado\bge_m3.ok para repetirlo).
+
+==================== [muestra10k] 20:07:08 ====================
+
+
+[muestra10k] listo en 43,8 min
+
+==================== [gen_convencional] 20:50:57 ====================
+
+
+
+[gen_convencional] listo en 21,3 min
+
+==================== [gen_k3] 21:12:17 ====================
+
+
+
+[gen_k3] listo en 8,4 min
+
+==================== [robustez] 21:20:41 ====================
+
+[robustez] listo en 29,4 min
+
+==================== [memoria] 21:50:04 ====================
+
+PS>ErrorTerminación(): "El paso 'memoria' falló (código 1). Corrija y vuelva a ejecutar el script."
+>> ErrorTerminación(): "El paso 'memoria' falló (código 1). Corrija y vuelva a ejecutar el script."
+El paso 'memoria' falló (código 1). Corrija y vuelva a ejecutar el script.
+El paso 'memoria' falló (código 1). Corrija y vuelva a ejecutar el script.
+En C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller 4\rag_milvus_taller\rag_milvus_taller\scripts\ejecutar_pendientes.ps1:
+38 Carácter: 32
++ ... DE -ne 0) { throw "El paso '$nombre' falló (código $LASTEXITCODE). Co ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (El paso 'memori...utar el script.:String) [], RuntimeException
+    + FullyQualifiedErrorId : El paso 'memoria' falló (código 1). Corrija y vuelva a ejecutar el script.
+
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261110215016
+**********************
+**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261110215515
+Nombre de usuario: NIBARRA\Nicol
+Usuario RunAs: NIBARRA\Nicol
+Nombre de la configuración: 
+Máquina: NIBARRA (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\ejecutar_pendientes.ps1
+Id. de proceso: 28632
+PSVersion: 5.1.26100.9168
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9168
+BuildVersion: 10.0.26100.9168
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+[entorno] ya hecho (borre reports\.estado\entorno.ok para repetirlo).
+
+[corpus] ya hecho (borre reports\.estado\corpus.ok para repetirlo).
+
+[base_corpus] ya hecho (borre reports\.estado\base_corpus.ok para repetirlo).
+
+[chunk128] ya hecho (borre reports\.estado\chunk128.ok para repetirlo).
+
+[chunk512] ya hecho (borre reports\.estado\chunk512.ok para repetirlo).
+
+[bge_m3] ya hecho (borre reports\.estado\bge_m3.ok para repetirlo).
+
+[muestra10k] ya hecho (borre reports\.estado\muestra10k.ok para repetirlo).
+
+[gen_convencional] ya hecho (borre reports\.estado\gen_convencional.ok para repetirlo).
+
+[gen_k3] ya hecho (borre reports\.estado\gen_k3.ok para repetirlo).
+
+[robustez] ya hecho (borre reports\.estado\robustez.ok para repetirlo).
+
+==================== [memoria] 21:55:16 ====================
+
+[memoria] listo en 2,7 min
+
+==================== [resumen] 21:58:00 ====================
+
+
+
+
+[resumen] listo en 2,1 min
+
+Todo listo. Falta solo calificar las respuestas nuevas de las ablaciones de generación:
+  C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller 4\rag_milvus_taller\rag_milvus_taller\reports\eval\planilla_ctx_convencional.xlsx
+  C:\Users\Nicol\OneDrive\Escritorio\Personal\Maestría\Segundo Semestre\PLN\Taller 4\rag_milvus_taller\rag_milvus_taller\reports\eval\planilla_k3.xlsx
+Después: docker compose exec api python -m scripts.evaluar_gold calificaciones-ablacion --etiqueta <ctx_convencional|k3>
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261110220006
+**********************

@@ -22,6 +22,7 @@ RUN pip install --no-compile -r requirements-dev.txt
 
 COPY app/ app/
 COPY scripts/ scripts/
+COPY configs/ configs/
 COPY tests/ tests/
 COPY pytest.ini ./
 
